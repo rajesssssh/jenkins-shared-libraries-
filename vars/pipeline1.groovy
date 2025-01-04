@@ -1,12 +1,3 @@
-@Library('my-shared-library@main') _
-pipeline {
-    agent { label 'slave2' }
-
-    environment {
-        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
-        MAVEN_HOME = '/usr/share/maven'
-        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
-    }
 def check_out() {
     echo 'Checking out code...'
     checkout scm
@@ -57,5 +48,4 @@ def stop_app() {
 def clean_app() {
     echo 'Cleaning up...'
     sh 'pkill -f "mvn spring-boot:run" || true'
-}
 }
