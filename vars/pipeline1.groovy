@@ -1,47 +1,72 @@
-def call() {
-    echo 'Checking out code...'
-    checkout scm
-    
-    echo 'Setting up Java 17...'
-    sh 'sudo apt update'
-    sh 'sudo apt install -y openjdk-17-jdk'
-  
-  
-    echo 'Setting up Maven...'
-    sh 'sudo apt install -y maven'
-  
-  
-    echo 'Building project with Maven...'
-    sh 'mvn clean package'
-  
-  
-    echo 'Uploading artifact...'
-    archiveArtifacts artifacts: artifactPath, allowEmptyArchive: true
-     
-   
-    echo 'Running Spring Boot application...'
-    sh 'nohup mvn spring-boot:run &'
-    sleep(time: 15, unit: 'SECONDS')
+@Library('my-shared-library@main') _ 
 
-     publicIp = sh(script: "curl -s https://checkip.amazonaws.com", returnStdout: true).trim()
-    echo "The application is running and accessible at: http://${publicIp}:8080"
-  
-  
-    echo 'Validating that the app is running...'
-     response = sh(script: 'curl --write-out "%{http_code}" --silent --output /dev/null http://localhost:8080', returnStdout: true).trim()
-    if (response == "200") 
-        echo 'The app is running successfully!'
-     else 
-        echo "The app failed to start. HTTP response code: ${response}"
-        error("The app did not start correctly!")
+pipeline {
+    agent { label 'slave2' }
+
+    environment {
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
+        MAVEN_HOME = '/usr/share/maven'
+        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                pipeline1.check_out()
+            }
+        }
+
+        stage('Set up Java 1') {
+            steps {
+                pipeline1.setup_java()
+            }
+        }
+
+        stage('Set up Maven') {
+            steps {
+                pipeline1.setup_maven()
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                pipeline1.setup_build()
+            }
+        }
+
+        stage('Upload Artifact') {
+            steps {
+                echo 'Uploading artifact...'
+                pipeline1.upload_artifact(String artifactPath)
+            }
+        }
+
+        stage('Run Application') {
+            steps {
+                pipeline1.run_application()
+            }
+        }
+
+        stage('Validate App is Running') {
+            steps {
+                pipeline1.validate_app()
+            }
+        }
+
+        stage('Keeping application up for 2 mins') {
+            steps {
+                pipeline1.keep_app()
+            }
+        }
+
+        stage('Gracefully Stop Spring Boot App') {
+            steps {
+                pipeline1.stop_app()
+            }
+        }
+    }
+}
+
     
+		
     
-  
-    echo 'Waiting for 2 minutes...'
-    sleep(time: 2, unit: 'MINUTES')  // Wait for 5 minutes
-   
-   
-    echo 'Gracefully stopping the Spring Boot application...'
-    sh 'mvn spring-boot:stop'
-   
-  }    
