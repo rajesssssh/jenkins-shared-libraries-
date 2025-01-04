@@ -1,3 +1,11 @@
+pipeline {
+    agent { label 'dev1' }
+
+    environment {
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
+        MAVEN_HOME = '/usr/share/maven'
+        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
+    }
 def check_out() {
     echo 'Checking out code...'
     checkout scm
@@ -36,7 +44,7 @@ def validate_app() {
         echo "The app failed to start. HTTP response code: ${response}"
         error("The app did not start correctly!")
     }
-}                       
+}
 def keep_app() {
     echo 'Waiting for 2 minutes...'
     sleep(time: 2, unit: 'MINUTES')  // Wait for 5 minutes
@@ -49,4 +57,3 @@ def clean_app() {
     echo 'Cleaning up...'
     sh 'pkill -f "mvn spring-boot:run" || true'
 }
-
