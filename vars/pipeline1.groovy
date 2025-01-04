@@ -44,7 +44,4 @@ def call() {
     echo 'Gracefully stopping the Spring Boot application...'
     sh 'mvn spring-boot:stop'
    
-  
-    echo 'Cleaning up...'
-    sh 'pkill -f "mvn spring-boot:run" || true'
   }    
