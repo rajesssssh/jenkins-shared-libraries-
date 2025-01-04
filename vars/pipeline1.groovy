@@ -23,12 +23,12 @@ def call() {
     sh 'nohup mvn spring-boot:run &'
     sleep(time: 15, unit: 'SECONDS')
 
-    def publicIp = sh(script: "curl -s https://checkip.amazonaws.com", returnStdout: true).trim()
+     publicIp = sh(script: "curl -s https://checkip.amazonaws.com", returnStdout: true).trim()
     echo "The application is running and accessible at: http://${publicIp}:8080"
   
   
     echo 'Validating that the app is running...'
-    def response = sh(script: 'curl --write-out "%{http_code}" --silent --output /dev/null http://localhost:8080', returnStdout: true).trim()
+     response = sh(script: 'curl --write-out "%{http_code}" --silent --output /dev/null http://localhost:8080', returnStdout: true).trim()
     if (response == "200") 
         echo 'The app is running successfully!'
      else 
