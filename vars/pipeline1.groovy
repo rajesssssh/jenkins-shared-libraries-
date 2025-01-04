@@ -1,3 +1,4 @@
+@Library('my-shared-library@main') _
 pipeline {
     agent { label 'slave2' }
 
@@ -56,4 +57,5 @@ def stop_app() {
 def clean_app() {
     echo 'Cleaning up...'
     sh 'pkill -f "mvn spring-boot:run" || true'
+}
 }
